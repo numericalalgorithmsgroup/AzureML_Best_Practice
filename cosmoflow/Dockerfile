@@ -1,4 +1,4 @@
-# Build image on top of NVidia MXnet image
+# Build image on top of NVidia TF1 image
 ARG FROM_IMAGE_NAME=nvcr.io/nvidia/tensorflow:20.12-tf1-py3
 FROM ${FROM_IMAGE_NAME}
 

@@ -2,9 +2,7 @@
 
 #### Author: Phil Tooley - [phil.tooley@nag.co.uk](mailto:phil.tooley@nag.co.uk)
 
-# ***DRAFT: For Partner Review***
-
-# Tutorial: HPC-Scale AI on AzureML: Training CosmoFlow
+# Tutorial: HPC-Scale AI with NVIDIA GPUs on AzureML: Training CosmoFlow
 
 *In our previous tutorials we have shown you how to [run training workloads on the AzureML
 platform] and [set up an HPC-class high performance filesystem]. Now we will put everything
@@ -18,6 +16,12 @@ when training large scale models.  In this tutorial we will demonstrate the step
 CosmoFlow on AzureML using a BeeOND filesystem for storage and demonstrate the [almost 10x
 speedup](#performance-comparison-beeond-vs-blobfuse) this gives over Azure-blob based Dataset
 storage.
+
+[set up an HPC-class high performance filesystem]: https://www.nag.com/blog/tutorial-beeond-azureml-high-performance-filesystem-hpc-scale-machine-learning-nvidia-gpus
+[adding the BeeOND filesystem to AzureML]: https://www.nag.com/blog/tutorial-beeond-azureml-high-performance-filesystem-hpc-scale-machine-learning-nvidia-gpus
+[BeeOND tutorial]: https://www.nag.com/blog/tutorial-beeond-azureml-high-performance-filesystem-hpc-scale-machine-learning-nvidia-gpus
+[BeeOND filesystem tutorial]: https://www.nag.com/blog/tutorial-beeond-azureml-high-performance-filesystem-hpc-scale-machine-learning-nvidia-gpus
+
 
 ## CosmoFlow - The Model and Dataset
 
@@ -102,7 +106,7 @@ $ azcopy copy --recursive --include-pattern="*.tfrecord.gz" --content-encoding="
   ./cosmo_data https://${storage_acct}.blob.core.windows.net/${container}?sv=${sas}
 ```
 
-You should substitute your own storage account, container and shared access signature (SAS) when
+You should substitute your own storage account, container and [shared access signature] (SAS) when
 uploading your data with AzCopy.  Shared access signatures are a recommended method for
 authenticating to storage accounts from scripts without revealing sensitive credentials such as an
 account key.  They provide control of access permissions (read, write, etc.), start and end times
@@ -110,6 +114,7 @@ for allowed accesss and fine-grained scoping down to the level of individual blo
 Storage Docs] contain all the information you need to know to create and manage shared access
 signatures.
 
+[shared access signature]: https://docs.microsoft.com/en-us/azure/storage/common/storage-sas-overview
 [Azure Storage Docs]: https://docs.microsoft.com/en-us/azure/storage/common/storage-sas-overview
 
 
@@ -177,8 +182,10 @@ AzureML remains the same.  Unlike Mask R-CNN, CosmoFlow does not require install
 package as a result the required Docker file is quite simple  and can be used as a basis for any
 TensorFlow based ML workload:
 
+[TensorFlow]: https://www.tensorflow.org/
+
 ```Dockerfile
-# Build image on top of NVidia MXnet image
+# Build image on top of NVidia TF1 image
 ARG FROM_IMAGE_NAME=nvcr.io/nvidia/tensorflow:20.12-tf1-py3
 FROM ${FROM_IMAGE_NAME}
 
@@ -313,15 +320,18 @@ minimize both time- and cost-to-solution.
 
 ## Summary
 
-High performance storage is a critical component of modern AI training deployments - without
-sufficient I/O bandwidth to supply them with data the computing power of modern GPUs is wasted.
-Using CosmoFlow as an example we find that a BeeOND high-performance filesystem backed
-implementation is over 5x faster than using Premium Blob and nearly 10x faster than using Hot Blob
-for storage. BeeOND runs on the compute instances and requires no additional cloud resources,
-meaning cost to solution is reduced by the same factor of 5 or 10x.  As GPUs become ever more
-powerful, ensuring you have storage that can meet their demands is crucial to deliver best AI
-training performance at best cost.
+As GPUs become ever more powerful, ensuring you have the right I/O configuration to meet their data
+demands is crucial to deliver best AI training performance at best cost.  Using CosmoFlow as an
+example we demonstrate how a BeeOND high-performance filesystem allows us to fully unlock the
+computational power of the NVIDIA V100 GPUs in our training cluster.  With the BeeOND filesystem
+data bottlenecks are eliminated and training performs 5-10x faster than when using network attached
+Azure Blob storage. BeeOND runs on the compute instances and requires no additional cloud
+resources. This makes it an extremely cost effective way to unlock maximum performance of your
+NVIDIA GPU-enabled clusters on AzureML, and can bring cost savings of up to 90% for multi-GPU and
+multi-node training workloads.
 
+The work demonstrated here was funded by Microsoft in partnership with NVIDIA. The authors like to
+thank Microsoft and NVIDIA employees for their contributions to this tutorial.
 
 ### Find out more:
 
